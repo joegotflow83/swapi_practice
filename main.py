@@ -17,20 +17,22 @@ def begin():
 
 
 def json_grab(obj, item, response, json_response):
-    for data in range(json_response.get('count') + 1):
-        url = "http://swapi.co/api/people/" + "{}/".format(data)
-        new_url = requests.get(url)
-        json_url = new_url.json()
-        print(json_url.get(item))
-    return json_response
-
-
-def data_grab(key, obj, json_response, item):
+    """display all data in a given category"""
     for data in range(json_response.get('count') + 1):
         url = "http://swapi.co/api/{}/".format(obj) + "{}/".format(data)
         new_url = requests.get(url)
         json_url = new_url.json()
-        if json_url.get('name') == key:
+        print(json_url.get(item))
+    return
+
+
+def data_grab(key, obj, json_response, item):
+    """Display specific data the user asks for"""
+    for data in range(json_response.get('count') + 1):
+        url = "http://swapi.co/api/{}/".format(obj) + "{}/".format(data)
+        new_url = requests.get(url)
+        json_url = new_url.json()
+        if json_url.get(item) == key:
             print('\n{}'.format(json_url.get(item)))
             return json_url
     return 'Not Found'
@@ -51,39 +53,24 @@ def json_films(key):
     response = requests.get("http://swapi.co/api/films/")
     json_response = response.json()
     if key == 'All':
-        for movie in range(json_response.get('count') + 1):
-            url = "http://swapi.co/api/films/" + "{}/".format(movie)
-            new_url = requests.get(url)
-            json_url = new_url.json()
-            print(json_url.get('title'))
-    for movie in range(json_response.get('count') + 1):
-        url = "http://swapi.co/api/films/" + "{}/".format(movie)
-        new_url = requests.get(url)
-        json_url = new_url.json()
-        if json_url.get('title') == key:
-            print('\n {}'.format(json_url.get('title')))
-            print('\n Top 3 Actors/Actresses: {}')
-            for actor in json_url.get('characters')[:3]:
-                response = requests.get(actor)
-                json_response = response.json()
-                print(json_response.get('name'))
-            return json_url
-    return 'Not Found'
+        print(json_grab('films', 'title', response, json_response))
+        return
+    movie = data_grab(key, 'films', json_response, 'title')
+    for actor in movie.get('characters')[:3]:
+        response = requests.get(actor)
+        json_response = response.json()
+        print(json_response.get('name'))
+    return movie
 
 
 def json_vehicles(key):
     """Grab SW vehicle"""
     response = requests.get("http://swapi.co/api/vehicles/")
     json_response = response.json()
-    for vehicle in range(json_response.get('count') + 1):
-        url = "http://swapi.co/api/vehicles/" + "{}/".format(vehicle)
-        new_url = requests.get(url)
-        json_url = new_url.json()
-        if json_url.get('name') == key:
-            print('\n {}'.format(json_url.get('name')))
-            print(json_url)
-            return
-    return 'Not Found'
+    if key == 'All':
+        print(json_grab('vehicles', 'name', response, json_response))
+        return
+    return data_grab(key, 'vehicles', json_response, 'name')
 
 
 def character():
